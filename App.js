@@ -3,6 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import HomeScreen from './src/screens/HomeScreen';
+import FavoriteScreen from './src/screens/FavoritesScreen';
+
 
 //Navigator
 import { createStackNavigator } from '@react-navigation/stack';
@@ -16,6 +18,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Favorites" component={FavoriteScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
