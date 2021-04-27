@@ -2,7 +2,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+
+//Screens
 import HomeScreen from './src/screens/HomeScreen';
+import FavoriteScreen from './src/screens/FavoritesScreen';
 
 //Redux
 import ReduxThunk from 'redux-thunk';
