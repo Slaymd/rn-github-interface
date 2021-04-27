@@ -3,13 +3,12 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import HomeScreen from './src/screens/HomeScreen';
-import { Provider as PaperProvider } from 'react-native-paper';
 
 //Redux
 import ReduxThunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider as StoreProvider } from 'react-redux';
-import reducers from './reducers/Reducer';
+import reducers from './src/reducers/Reducer';
 
 //Navigator
 import { createStackNavigator } from '@react-navigation/stack';
@@ -24,14 +23,12 @@ export default function App() {
   return (
     <>
       <StoreProvider store={store}>
-        <PaperProvider>
-          <StatusBar/>
-          <NavigationContainer>
-            <Stack.Navigator>
-              <Stack.Screen name="Home" component={HomeScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </PaperProvider>
+        <StatusBar/>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Home" component={HomeScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
       </StoreProvider>
     </>
   );
