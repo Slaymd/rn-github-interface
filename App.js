@@ -3,21 +3,36 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import HomeScreen from './src/screens/HomeScreen';
+import { Provider as PaperProvider } from 'react-native-paper';
+
+//Redux
+import ReduxThunk from 'redux-thunk';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider as StoreProvider } from 'react-redux';
+import reducers from './reducers/Reducer';
 
 //Navigator
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 const Stack = createStackNavigator();
 
+//Store
+let middlewares = [ReduxThunk];
+const store = createStore(reducers, applyMiddleware(...middlewares));
+
 export default function App() {
   return (
     <>
-      <StatusBar/>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={HomeScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <StoreProvider store={store}>
+        <PaperProvider>
+          <StatusBar/>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="Home" component={HomeScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </PaperProvider>
+      </StoreProvider>
     </>
   );
 }
