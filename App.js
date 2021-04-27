@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 //Screens
 import HomeScreen from './src/screens/HomeScreen';
 import FavoriteScreen from './src/screens/FavoritesScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 //Redux
 import ReduxThunk from 'redux-thunk';
