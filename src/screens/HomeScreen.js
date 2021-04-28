@@ -45,7 +45,7 @@ function HomeScreen({navigation, ...props}) {
 
 						</View>
 
-						{setSearchResults}
+						{searchResults}
 
 					</ScrollView>
 				</View>
