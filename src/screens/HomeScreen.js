@@ -1,7 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, View, ScrollView, TouchableOpacity, Text } from 'react-native';
 
-export default class HomeScreen extends React.Component {
+function HomeScreen({navigation, ...props}) {
+
+	//State
+	const [searchText, setSearchText] = useState("");
+	const [searchResults, setSearchResults] = useState([]);
+
+	/*
+	**	FUNCTIONS
+	*/
+
+	const fetchSearchResults = () => {
+		console.log("Fetch search results for", searchText);
+	}
+
+	/*
+	**	EVENTS
+	*/
+
+	useEffect(() => {
+		console.log("Search text", searchText);
+	}, [searchText])
+
+	/*
+	**	RENDER
+	*/
+
+	return (
+		<View style={styles.container}>
+				<View>
+					<ScrollView>
+						<View style={styles.inputContainer}>
+							<TextInput
+								style={styles.textInput}
+								placeholder="Search user or repository"
+								value={searchText}
+								onChangeText={setSearchText}
+							/>
+
+							<TouchableOpacity style={styles.applyButton} onPress={fetchSearchResults}>
+								<Text style={styles.applyButtonText}>Search</Text>
+							</TouchableOpacity>
+
+						</View>
+
+						{setSearchResults}
+
+					</ScrollView>
+				</View>
+			</View>
+	)
+
+}
+
+export default HomeScreen;
+
+export class HomeScreenClass extends React.Component {
 
 	constructor(props) {
 		super(props);
