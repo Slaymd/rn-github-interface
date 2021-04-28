@@ -70,8 +70,11 @@ const styles = StyleSheet.create({
 		marginRight: 20
 	},
 	applyButton: {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
 		backgroundColor: '#0000FF',
-		padding: 5,
+		padding: 10,
 	},
 	applyButtonText: {
 		color: '#FFFFFF',
