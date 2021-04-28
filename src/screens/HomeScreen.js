@@ -1,5 +1,7 @@
+//Imports
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import axios from 'axios';
 
 function HomeScreen({navigation, ...props}) {
 
@@ -11,8 +13,18 @@ function HomeScreen({navigation, ...props}) {
 	**	FUNCTIONS
 	*/
 
-	const fetchSearchResults = () => {
+	const fetchSearchResults = async () => {
 		console.log("Fetch search results for", searchText);
+		Promise.all([axios.get(`https://api.github.com/search/repositories?q=${searchText}`),
+		axios.get(`https://api.github.com/search/users?q=${searchText}`)]).then(res => {
+			const repositoriesResults = res[0].data.items;
+			const usersResults = res[1].data.items;
+
+			console.log("Repos: " + repositoriesResults.length);
+			console.log("Users: " + usersResults.length);
+		}).catch(err => {
+			console.log("Error: " + err.message);
+		});
 	}
 
 	/*
