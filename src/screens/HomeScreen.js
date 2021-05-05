@@ -1,14 +1,15 @@
 //Imports
 import React, { useState, useEffect } from 'react';
 import Button from '../components/Button';
-import { StyleSheet, TextInput, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, TextInput, View, ScrollView, TouchableOpacity, Text, FlatList } from 'react-native';
 import axios from 'axios';
 
 function HomeScreen({navigation, ...props}) {
 
 	//State
 	const [searchText, setSearchText] = useState("");
-	const [searchResults, setSearchResults] = useState([]);
+	const [searchUsersResults, setSearchUsersResults] = useState([]);
+	const [searchReposResults, setSearchReposResults] = useState([]);
 
 	/*
 	**	FUNCTIONS
@@ -22,7 +23,10 @@ function HomeScreen({navigation, ...props}) {
 			const usersResults = res[1].data.items;
 
 			console.log("Repos: " + repositoriesResults.length);
+			console.log(repositoriesResults);
 			console.log("Users: " + usersResults.length);
+			setSearchUsersResults(usersResults);
+			setSearchReposResults(repositoriesResults);
 		}).catch(err => {
 			console.log("Error: " + err.message);
 		});
@@ -58,7 +62,16 @@ function HomeScreen({navigation, ...props}) {
 
 						</View>
 
-						{searchResults}
+						<FlatList
+							data={searchUsersResults}
+							keyExtractor={(item) => item.id.toString()}
+							renderItem={({item}) => <Text>{item.login}</Text>}
+						/>
+						<FlatList
+							data={searchReposResults}
+							keyExtractor={(item) => item.id.toString()}
+							renderItem={({item}) => <Text>{item.full_name}</Text>}
+						/>
 
 					</ScrollView>
 				</View>
