@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../components/Button';
 import { StyleSheet, TextInput, View, ScrollView, TouchableOpacity, Text } from 'react-native';
 
 export default class HomeScreen extends React.Component {
@@ -34,14 +35,13 @@ export default class HomeScreen extends React.Component {
 								value={this.state.search}
 								onChangeText={this.handleSearchChange}
 							/>
-
-							<TouchableOpacity style={styles.applyButton} onPress={this.handleSearch}>
-								<Text style={styles.applyButtonText}>Search</Text>
-							</TouchableOpacity>
-
+							<Button onClick={this.handleSearch} text={'coucou'}/>
 						</View>
-
+						<View style={{backgroundColor: 'red', flexDirection: 'row', marginBottom: 3}}>
+							<Text>coucou</Text>
+						</View>
 						{this.state.list}
+						<Button onClick={this.handleSearch} text={'Découvrir plus'}/>
 
 					</ScrollView>
 				</View>
