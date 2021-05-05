@@ -10,7 +10,8 @@ function HomeScreen({navigation, ...props}) {
 
 	//State
 	const [searchText, setSearchText] = useState("");
-	const [searchResults, setSearchResults] = useState([]);
+	const [searchUsersResults, setSearchUsersResults] = useState([]);
+	const [searchReposResults, setSearchReposResults] = useState([]);
 
 	/*
 	**	FUNCTIONS
