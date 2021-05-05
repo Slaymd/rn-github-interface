@@ -1,7 +1,10 @@
 //Imports
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, SafeAreaView, TextInput, View, FlatList, SectionList, TouchableOpacity, Text } from 'react-native';
 import axios from 'axios';
+
+//Components
+import UserCard from '../layouts/UserCard';
 
 function HomeScreen({navigation, ...props}) {
 
@@ -14,14 +17,20 @@ function HomeScreen({navigation, ...props}) {
 	*/
 
 	const fetchSearchResults = async () => {
+		//TODO: IMPLEMENT FLATLIST AND FETCH PAGES WHEN END REACHED
 		console.log("Fetch search results for", searchText);
 		Promise.all([axios.get(`https://api.github.com/search/repositories?q=${searchText}`),
 		axios.get(`https://api.github.com/search/users?q=${searchText}`)]).then(res => {
 			const repositoriesResults = res[0].data.items;
 			const usersResults = res[1].data.items;
 
-			console.log("Repos: " + repositoriesResults.length);
-			console.log("Users: " + usersResults.length);
+			setSearchResults([
+				{title: 'Users', data: usersResults},
+				{title: 'Repositories', data: repositoriesResults}
+			]);
+
+			//console.log("Repos: " + repositoriesResults.length);
+			//console.log("Users: " + usersResults.length);
 		}).catch(err => {
 			console.log("Error: " + err.message);
 		});
@@ -39,83 +48,40 @@ function HomeScreen({navigation, ...props}) {
 	**	RENDER
 	*/
 
+	console.log(searchResults);
+
+	const renderSearchItem = ({item}) => (item.type === 'User' || item.type === 'Organization' ?
+			<UserCard user={item}/>
+		:
+			null
+	)
+
 	return (
-		<View style={styles.container}>
-				<View>
-					<ScrollView>
-						<View style={styles.inputContainer}>
-							<TextInput
-								style={styles.textInput}
-								placeholder="Search user or repository"
-								value={searchText}
-								onChangeText={setSearchText}
-							/>
+		<SafeAreaView style={styles.container}>
+			<TextInput
+				style={styles.textInput}
+				placeholder="Search user or repository"
+				value={searchText}
+				onChangeText={setSearchText}
+			/>
 
-							<TouchableOpacity style={styles.applyButton} onPress={fetchSearchResults}>
-								<Text style={styles.applyButtonText}>Search</Text>
-							</TouchableOpacity>
-
-						</View>
-
-						{searchResults}
-
-					</ScrollView>
-				</View>
-			</View>
+			<TouchableOpacity style={styles.applyButton} onPress={fetchSearchResults}>
+				<Text style={styles.applyButtonText}>Search</Text>
+			</TouchableOpacity>
+			<SectionList
+				sections={searchResults}
+				renderItem={renderSearchItem}
+				keyExtractor={(item, index) => item.id + index}
+				renderSectionHeader={({ section: { title } }) => (
+					<Text style={styles.header}>{title}</Text>
+				)}
+			/>
+		</SafeAreaView>
 	)
 
 }
 
 export default HomeScreen;
-
-export class HomeScreenClass extends React.Component {
-
-	constructor(props) {
-		super(props);
-		this.state = {
-			search: '',
-			list: []
-		}
-
-		this.handleSearchChange = this.handleSearchChange.bind(this);
-		this.handleSearch = this.handleSearch.bind(this);
-	}
-
-	handleSearchChange(search) {
-		this.setState({ search });
-	}
-
-	handleSearch() {
-		console.log(this.state.search);
-	}
-
-	render() {
-		return (
-			<View style={styles.container}>
-				<View>
-					<ScrollView>
-						<View style={styles.inputContainer}>
-							<TextInput
-								style={styles.textInput}
-								placeholder="Search user or repository"
-								value={this.state.search}
-								onChangeText={this.handleSearchChange}
-							/>
-
-							<TouchableOpacity style={styles.applyButton} onPress={this.handleSearch}>
-								<Text style={styles.applyButtonText}>Search</Text>
-							</TouchableOpacity>
-
-						</View>
-
-						{this.state.list}
-
-					</ScrollView>
-				</View>
-			</View>
-		);
-	}
-}
 
 const styles = StyleSheet.create({
 	container: {
