@@ -1,40 +1,61 @@
 //Imports
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, TextInput, View, FlatList, SectionList, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, TextInput, View, FlatList, RefreshControl, Text } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import axios from 'axios';
 
 //Components
 import UserCard from '../layouts/UserCard';
+import RepoCard from '../layouts/RepoCard';
+import IconButton from '../layouts/IconButton';
 
 function HomeScreen({navigation, ...props}) {
 
 	//State
+	const [searchMode, setSearchMode] = useState('users');
 	const [searchText, setSearchText] = useState("");
-	const [searchUsersResults, setSearchUsersResults] = useState([]);
-	const [searchReposResults, setSearchReposResults] = useState([]);
+	const [userResults, setUsersResults] = useState([]);
+	const [repoResults, setRepoResults] = useState([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [isLoading, setIsLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState(null);
 
 	/*
 	**	FUNCTIONS
 	*/
 
-	const fetchSearchResults = async () => {
-		//TODO: IMPLEMENT FLATLIST AND FETCH PAGES WHEN END REACHED
-		console.log("Fetch search results for", searchText);
-		Promise.all([axios.get(`https://api.github.com/search/repositories?q=${searchText}`),
-		axios.get(`https://api.github.com/search/users?q=${searchText}`)]).then(res => {
-			const repositoriesResults = res[0].data.items;
-			const usersResults = res[1].data.items;
+	const fetchSearchResults = () => {
+		if (!searchText || searchText.length === 0 || isLoading)
+			return;
+		const apiUrl = `https://api.github.com/search/${searchMode}?q=${searchText}&page=${currentPage}&per_page=10`
 
-			setSearchResults([
-				{title: 'Users', data: usersResults},
-				{title: 'Repositories', data: repositoriesResults}
-			]);
-
-			//console.log("Repos: " + repositoriesResults.length);
-			//console.log("Users: " + usersResults.length);
+		setIsLoading(true);
+		axios.get(apiUrl).then(res => {
+			if (searchMode === 'users')
+				setUsersResults(currentPage > 1 ? [...userResults, ...res.data.items] : res.data.items);
+			else if (searchMode === 'repositories')
+				setRepoResults(currentPage > 1 ? [...repoResults, ...res.data.items] : res.data.items);
+			setIsLoading(false);
+			setErrorMessage(null);
 		}).catch(err => {
-			console.log("Error: " + err.message);
-		});
+			setErrorMessage("An error occured ! Please try again later.");
+			setIsLoading(false);
+		})
+	}
+
+	const onSearchButtonPressed = () => {
+		if (isLoading)
+			return;
+		setUsersResults([]);
+		setRepoResults([]);
+		setCurrentPage(1)
+		setTimeout(() => {
+			fetchSearchResults();
+		}, 100)
+	}
+
+	const onSwitchButtonPressed = () => {
+		setSearchMode(searchMode === 'users' ? 'repositories' : 'users');
 	}
 
 	/*
@@ -42,42 +63,66 @@ function HomeScreen({navigation, ...props}) {
 	*/
 
 	useEffect(() => {
-		console.log("Search text", searchText);
-	}, [searchText])
+		setCurrentPage(1);
+	}, [searchText]);
+
+	useEffect(() => {
+		setUsersResults([]);
+		setRepoResults([]);
+		fetchSearchResults();
+		setCurrentPage(1);
+	}, [searchMode]);
 
 	/*
 	**	RENDER
 	*/
 
-	console.log(searchResults);
-
 	const renderSearchItem = ({item}) => (item.type === 'User' || item.type === 'Organization' ?
 			<UserCard user={item}/>
 		:
-			null
+			<RepoCard repo={item}/>
 	)
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<TextInput
-				style={styles.textInput}
-				placeholder="Search user or repository"
-				value={searchText}
-				onChangeText={setSearchText}
-			/>
-
-			<TouchableOpacity style={styles.applyButton} onPress={fetchSearchResults}>
-				<Text style={styles.applyButtonText}>Search</Text>
-			</TouchableOpacity>
-			<SectionList
-				sections={searchResults}
+		<View style={styles.container}>
+			<View style={styles.searchFieldContainer}>
+				<TextInput
+					style={styles.textInput}
+					placeholder={searchMode === 'users' ? 'Search user' : 'Search repository'}
+					value={searchText}
+					onChangeText={setSearchText}
+					onEndEditing={onSearchButtonPressed}
+					returnKeyType="search"
+				/>
+				<IconButton
+					style={{backgroundColor: searchMode === 'users' ? '#3c40c6' : '#9b59b6'}}
+					iconName={searchMode === 'users' ? 'account' : 'source-repository-multiple'}
+					onPress={onSwitchButtonPressed}
+				/>
+			</View>
+			{errorMessage && <View style={styles.alertContainer}>
+				<MaterialCommunityIcons name="alert" size={16} color="white"/>
+				<Text style={styles.alertText}>{errorMessage}</Text>
+			</View>}
+			<FlatList
+				data={searchMode === 'users' ? userResults : repoResults}
 				renderItem={renderSearchItem}
-				keyExtractor={(item, index) => item.id + index}
-				renderSectionHeader={({ section: { title } }) => (
-					<Text style={styles.header}>{title}</Text>
-				)}
+				keyExtractor={(item, index) => item.id + "-" + index}
+				refreshControl={
+					<RefreshControl
+					  refreshing={isLoading}
+					  onRefresh={onSearchButtonPressed}
+					/>
+				}
+				onEndReachedThreshold={0.5}
+				onEndReached={() => {
+					if ((searchMode === 'users' && userResults.length >= 10) || (searchMode === 'repositories' && repoResults.length >= 10) && !isLoading) {
+						setCurrentPage(currentPage + 1)
+						fetchSearchResults();
+					}
+				}}
 			/>
-		</SafeAreaView>
+		</View>
 	)
 
 }
@@ -87,21 +132,31 @@ export default HomeScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#FFFFFF'
+		backgroundColor: '#F6F6FB'
 	},
-	inputContainer: {
+	searchFieldContainer: {
 		flexDirection: 'row',
-		justifyContent: 'center',
-		marginTop: 10,
-		marginBottom: 10
+		alignItems: 'center',
+		paddingHorizontal: 10
 	},
 	textInput: {
-		borderWidth: 1,
-		height: 40,
-		width: '65%',
+		flex: 1,
+		marginVertical: 10,
+		marginHorizontal: 10,
+		backgroundColor: 'white',
 		fontSize: 16,
-		padding: 10,
-		marginRight: 20
+		height: 40,
+		paddingHorizontal: 15,
+		fontFamily: 'Ubuntu_500Medium',
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.13,
+		shadowRadius: 3.84,
+		elevation: 4,
+		borderRadius: 20,
 	},
 	applyButton: {
 		display: 'flex',
@@ -114,5 +169,29 @@ const styles = StyleSheet.create({
 		color: '#FFFFFF',
 		fontSize: 16,
 		textAlign: 'center'
+	},
+	alertContainer: {
+		height: 40,
+		marginTop: 20,
+		marginHorizontal: 20,
+		borderRadius: 5,
+		backgroundColor: '#e74c3c',
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.13,
+		shadowRadius: 3.84,
+		elevation: 4,
+		alignItems: 'center',
+		paddingHorizontal: 10,
+		flexDirection: 'row'
+	},
+	alertText: {
+		color: 'white',
+		fontFamily: 'Ubuntu_700Bold',
+		fontSize: 14,
+		paddingLeft: 5
 	}
 })

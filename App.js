@@ -1,7 +1,8 @@
 //Imports
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import AppLoading from 'expo-app-loading';
+import { useFonts, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/ubuntu';
 
 //Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -24,6 +25,14 @@ let middlewares = [ReduxThunk];
 const store = createStore(reducers, applyMiddleware(...middlewares));
 
 export default function App() {
+
+  let [fontsLoaded] = useFonts({
+    Ubuntu_500Medium, Ubuntu_700Bold
+  });
+
+  if (!fontsLoaded)
+    return <AppLoading/>
+
   return (
     <>
       <StoreProvider store={store}>
@@ -37,12 +46,3 @@ export default function App() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
