@@ -1,8 +1,75 @@
-import React from 'react';
+//Imports
+import React, { useState, useEffect } from 'react';
 import Button from '../components/Button';
 import { StyleSheet, TextInput, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import axios from 'axios';
 
-export default class HomeScreen extends React.Component {
+function HomeScreen({navigation, ...props}) {
+
+	//State
+	const [searchText, setSearchText] = useState("");
+	const [searchResults, setSearchResults] = useState([]);
+
+	/*
+	**	FUNCTIONS
+	*/
+
+	const fetchSearchResults = async () => {
+		console.log("Fetch search results for", searchText);
+		Promise.all([axios.get(`https://api.github.com/search/repositories?q=${searchText}`),
+		axios.get(`https://api.github.com/search/users?q=${searchText}`)]).then(res => {
+			const repositoriesResults = res[0].data.items;
+			const usersResults = res[1].data.items;
+
+			console.log("Repos: " + repositoriesResults.length);
+			console.log("Users: " + usersResults.length);
+		}).catch(err => {
+			console.log("Error: " + err.message);
+		});
+	}
+
+	/*
+	**	EVENTS
+	*/
+
+	useEffect(() => {
+		console.log("Search text", searchText);
+	}, [searchText])
+
+	/*
+	**	RENDER
+	*/
+
+	return (
+		<View style={styles.container}>
+				<View>
+					<ScrollView>
+						<View style={styles.inputContainer}>
+							<TextInput
+								style={styles.textInput}
+								placeholder="Search user or repository"
+								value={searchText}
+								onChangeText={setSearchText}
+							/>
+
+							<TouchableOpacity style={styles.applyButton} onPress={fetchSearchResults}>
+								<Text style={styles.applyButtonText}>Search</Text>
+							</TouchableOpacity>
+
+						</View>
+
+						{searchResults}
+
+					</ScrollView>
+				</View>
+			</View>
+	)
+
+}
+
+export default HomeScreen;
+
+export class HomeScreenClass extends React.Component {
 
 	constructor(props) {
 		super(props);
