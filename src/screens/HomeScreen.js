@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, View, FlatList, RefreshControl, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import axios from 'axios';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 //Components
 import UserCard from '../layouts/UserCard';
@@ -73,6 +74,11 @@ function HomeScreen({navigation, ...props}) {
 		setCurrentPage(1);
 	}, [searchMode]);
 
+	useEffect(() => {
+		if (currentPage > 1)
+			fetchSearchResults();
+	}, [currentPage]);
+
 	/*
 	**	RENDER
 	*/
@@ -84,7 +90,7 @@ function HomeScreen({navigation, ...props}) {
 	)
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, {paddingTop: safeAreaInsets.top}]}>
 			<View style={styles.searchFieldContainer}>
 				<TextInput
 					style={styles.textInput}
@@ -95,8 +101,8 @@ function HomeScreen({navigation, ...props}) {
 					returnKeyType="search"
 				/>
 				<IconButton
-					style={{backgroundColor: searchMode === 'users' ? '#3c40c6' : '#9b59b6'}}
-					iconName={searchMode === 'users' ? 'account' : 'source-repository-multiple'}
+					style={{backgroundColor: searchMode !== 'users' ? '#3c40c6' : '#9b59b6'}}
+					iconName={searchMode !== 'users' ? 'account' : 'source-repository-multiple'}
 					onPress={onSwitchButtonPressed}
 				/>
 			</View>
@@ -116,18 +122,14 @@ function HomeScreen({navigation, ...props}) {
 				}
 				onEndReachedThreshold={0.5}
 				onEndReached={() => {
-					if ((searchMode === 'users' && userResults.length >= 10) || (searchMode === 'repositories' && repoResults.length >= 10) && !isLoading) {
+					if ((searchMode === 'users' && userResults.length >= 10) || (searchMode === 'repositories' && repoResults.length >= 10) && !isLoading)
 						setCurrentPage(currentPage + 1)
-						fetchSearchResults();
-					}
 				}}
 			/>
 		</View>
 	)
 
 }
-
-export default HomeScreen;
 
 const styles = StyleSheet.create({
 	container: {
@@ -194,4 +196,6 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		paddingLeft: 5
 	}
-})
+});
+
+export default HomeScreen;
