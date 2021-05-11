@@ -9,7 +9,7 @@ export default function UserCard({user}) {
 	const navigation = useNavigation();
 
 	const onPress = () => {
-		navigation.navigate('UserScreen', {id: user.id});
+		navigation.navigate('UserScreen', {userData: user});
 	}
 
 	return (

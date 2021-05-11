@@ -6,8 +6,8 @@ import { useFonts, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/u
 
 //Screens
 import HomeScreen from './src/screens/HomeScreen';
-import FavoriteScreen from './src/screens/FavoritesScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
+import RepoScreen from './src/screens/RepoScreen';
+import IssueScreen from './src/screens/IssueScreen';
 
 //Redux
 import ReduxThunk from 'redux-thunk';
@@ -40,6 +40,8 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Repository" component={RepoScreen} />
+            <Stack.Screen name="Issue" component={IssueScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </StoreProvider>

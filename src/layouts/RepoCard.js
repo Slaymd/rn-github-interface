@@ -1,8 +1,10 @@
 //Imports
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+
 
 export default function RepoCard({repo}) {
 
@@ -10,7 +12,14 @@ export default function RepoCard({repo}) {
 	const navigation = useNavigation();
 
 	const onPress = () => {
-		navigation.navigate('RepoScreen', {id: repo.id});
+		const apiUrlCollabs = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/contributors`
+
+		axios.get(apiUrlCollabs).then(res => {
+			navigation.navigate('Repository', {repo: repo, collab: res});
+		}).catch(err => {
+			setErrorMessage("An error occured ! Please try again later.");
+			setIsLoading(false);
+		})
 	}
 
 	const getCodeIcon = (/*string*/language) => {
