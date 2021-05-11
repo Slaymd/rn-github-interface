@@ -4,7 +4,15 @@ import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native';
 
+//Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { addFavorite, deleteFavorite } from '../actions/FavoritesActions';
+
 export default function RepoCard({repo}) {
+
+	//Redux
+	const dispatch = useDispatch();
+	const favorites = useSelector(state => state.favorites.favorites);
 
 	//Navigation
 	const navigation = useNavigation();
@@ -44,8 +52,21 @@ export default function RepoCard({repo}) {
 
 	const codeIcon = getCodeIcon(repo.language ?? "");
 
+
+	const isFavorite = typeof favorites.find(el => el.id === repo.id) === 'object';
+
+	const onLongPress = () => {
+		if (!isFavorite) {
+			alert("Ajouté aux favoris");
+			dispatch(addFavorite(repo));
+		} else {
+			alert("Retiré des favoris");
+			dispatch(deleteFavorite(repo.id));
+		}
+	}
+
 	return (
-		<TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+		<TouchableOpacity onPress={onPress} onLongPress={onLongPress} activeOpacity={0.7}>
 			<View style={styles.container}>
 				<View style={styles.ownerContainer}>
 					<Image style={styles.avatar} source={{uri: repo.owner.avatar_url}}/>

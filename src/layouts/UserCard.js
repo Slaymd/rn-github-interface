@@ -3,7 +3,15 @@ import React from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+//Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { addFavorite, deleteFavorite } from '../actions/FavoritesActions';
+
 export default function UserCard({user}) {
+
+	//Redux
+	const dispatch = useDispatch();
+	const favorites = useSelector(state => state.favorites.favorites);
 
 	//Navigation
 	const navigation = useNavigation();
@@ -12,8 +20,20 @@ export default function UserCard({user}) {
 		navigation.navigate('UserScreen', {id: user.id});
 	}
 
+	const isFavorite = typeof favorites.find(el => el.id === user.id) === 'object';
+
+	const onLongPress = () => {
+		if (!isFavorite) {
+			alert("Ajouté aux favoris");
+			dispatch(addFavorite(user));
+		} else {
+			alert("Retiré des favoris");
+			dispatch(deleteFavorite(user.id));
+		}
+	}
+
 	return (
-		<TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+		<TouchableOpacity onPress={onPress} onLongPress={onLongPress} activeOpacity={0.7}>
 			<View style={styles.container}>
 				<Image style={styles.avatar} source={{uri: user.avatar_url}}/>
 				<Text style={styles.text}>{user.login}</Text>
