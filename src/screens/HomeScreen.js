@@ -5,12 +5,21 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import axios from 'axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+//Redux
+import { useDispatch } from 'react-redux';
+import { loadFavorites } from '../actions/FavoritesActions';
+
 //Components
 import UserCard from '../layouts/UserCard';
 import RepoCard from '../layouts/RepoCard';
 import IconButton from '../layouts/IconButton';
 
 function HomeScreen({navigation, ...props}) {
+
+	const safeAreaInsets = useSafeAreaInsets();
+
+	//Redux
+    const dispatch = useDispatch();
 
 	//State
 	const [searchMode, setSearchMode] = useState('users');
@@ -62,6 +71,10 @@ function HomeScreen({navigation, ...props}) {
 	/*
 	**	EVENTS
 	*/
+
+	useEffect(() => {
+		dispatch(loadFavorites());
+	}, []);
 
 	useEffect(() => {
 		setCurrentPage(1);
