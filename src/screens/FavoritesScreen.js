@@ -1,97 +1,46 @@
 import React from 'react';
-import { SafeAreaView, View, FlatList, StyleSheet, Text, StatusBar } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
+import { useSelector } from "react-redux";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const DATA = [
-	{
-		name : 'Marco',
-		type : 'Repository'
-	},
-	{
-		name : 'Darius',
-		type : 'User'
-	},
-	{
-		name : 'Camille',
-		type : 'Repository'
-	},
-	{
-		name : 'François',
-		type : 'Repository'
-	},
-	{
-		name : 'Marco',
-		type : 'Repository'
-	},
-	{
-		name : 'Darius',
-		type : 'User'
-	},
-	{
-		name : 'Camille',
-		type : 'Repository'
-	},
-	{
-		name : 'François',
-		type : 'Repository'
-	},
-	{
-		name : 'Marco',
-		type : 'Repository'
-	},
-	{
-		name : 'Darius',
-		type : 'User'
-	},
-	{
-		name : 'Camille',
-		type : 'Repository'
-	},
-	{
-		name : 'François',
-		type : 'Repository'
-	},
+//Components
+import UserCard from '../layouts/UserCard';
+import RepoCard from '../layouts/RepoCard';
+
+function FavoritesScreen() {
+
+	const safeAreaInsets = useSafeAreaInsets();
 
 
-  ];
+	//Redux
+	const favorites = useSelector(state => state.favorites.favorites);
 
+	/*
+	**	RENDER
+	*/
 
-const Favorite = ({ type, name }) => (
-	<View style={styles.item}>
-		<Text >Type : {type}</Text>
-		<Text >Name : {name}</Text>
-	</View>
-);
-
-function FavoriteScreen() {
-	const renderItem = ({ item }) => (
-		<Favorite name={item.name} type={item.type}/>
-	);
+	const renderSearchItem = ({item}) => (item.type === 'User' || item.type === 'Organization' ?
+			<UserCard user={item}/>
+		:
+			<RepoCard repo={item}/>
+	)
 	
 	return (
-		<SafeAreaView style={styles.container}>
-			<FlatList
-			data={DATA}
-			renderItem={renderItem}
-			keyExtractor={item => item.name}
-			/>
-	  	</SafeAreaView>
+		<FlatList
+			style={[styles.container, {paddingTop: safeAreaInsets.top + 15}]}
+			data={favorites}
+			renderItem={renderSearchItem}
+			keyExtractor={(item, index) => item.id + "-" + index}
+		/>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
-	  flex: 1,
-	  marginTop: StatusBar.currentHeight || 0,
-	},
-	item: {
-	  backgroundColor: '#f9c2ff',
-	  padding: 20,
-	  marginVertical: 8,
-	  marginHorizontal: 16,
-	},
-	title: {
-	  fontSize: 32,
-	},
-  });
+		flex: 1,
+		backgroundColor: '#F6F6FB',
+		paddingBottom: 15
+	}
+});
 
-export default FavoriteScreen;
+export default FavoritesScreen;
