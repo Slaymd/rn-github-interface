@@ -9,6 +9,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import HomeScreen from './src/screens/HomeScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import UserScreen from './src/screens/UserScreen';
 
 //Redux
 import ReduxThunk from 'redux-thunk';
@@ -31,6 +32,7 @@ function SearchStackNavigator() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Search" component={HomeScreen} />
+      <Stack.Screen name="Users" component={UserScreen} />
     </Stack.Navigator>
   )
 }

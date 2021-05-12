@@ -1,45 +1,26 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, FlatList, ScrollView } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import UserCard from '../layouts/UserCard';
 import RepoCard from '../layouts/RepoCard';
 
-function UserScreen({ navigation, ...props }) {
+function UserScreen({ route, navigation }) {
 
-    const [user, setUser] = useState({
-        "avatar_url": "https://avatars.githubusercontent.com/u/1348035?v=4",
-        "events_url": "https://api.github.com/users/Slaymd/events{/privacy}",
-        "followers_url": "https://api.github.com/users/Slaymd/followers",
-        "following_url": "https://api.github.com/users/Slaymd/following{/other_user}",
-        "gists_url": "https://api.github.com/users/Slaymd/gists{/gist_id}",
-        "gravatar_id": "",
-        "html_url": "https://github.com/Slaymd",
-        "id": 1348035,
-        "login": "Slaymd",
-        "node_id": "MDQ6VXNlcjEzNDgwMzU=",
-        "organizations_url": "https://api.github.com/users/Slaymd/orgs",
-        "received_events_url": "https://api.github.com/users/Slaymd/received_events",
-        "repos_url": "https://api.github.com/users/Slaymd/repos",
-        "score": 1,
-        "site_admin": false,
-        "starred_url": "https://api.github.com/users/Slaymd/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/Slaymd/subscriptions",
-        "type": "User",
-        "url": "https://api.github.com/users/Slaymd",
-    });
+    const user = route.params;
     const [repos, setRepos] = useState([]);
     const [followers, setFollowers] = useState([]);
 
     const fetchResult = () => {
-        axios.get(user.repos_url).then(res => {
-            setRepos(res.data)
+        axios.get(user.userData.followers_url).then(res => {
+            setFollowers(res.data)
         }).catch(err => {
             console.log("Error : ", err);
         })
 
-        axios.get(user.followers_url).then(res => {
-            setFollowers(res.data)
+        axios.get(user.userData.repos_url).then(res => {
+            setRepos(res.data)
         }).catch(err => {
             console.log("Error : ", err);
         })
@@ -57,13 +38,17 @@ function UserScreen({ navigation, ...props }) {
                         <Image
                             style={styles.logo}
                             source={{
-                                uri: 'https://avatars.githubusercontent.com/u/1348035?v=4',
+                                uri: user.userData.avatar_url,
                             }}
                         />
-                        <View style={{ marginLeft: 15 }}>
-                            <Text style={[styles.name, { marginTop: 15, marginBottom: 15}]}>{user.login}</Text>
-                            <Text>Type : {user.type}</Text>
+                        <View style={{ marginLeft: 20 }}>
+                            <Text style={[styles.userName, { marginTop: 15, marginBottom: 15}]}>{user.userData.login}</Text>
+                            <Text>Type : {user.userData.type}</Text>
                         </View>
+                    </View>
+                    <View style={styles.containerFav}>
+                        <Text style={styles.textFav}>Add as favorite</Text>
+                        <MaterialCommunityIcons name="heart-outline" size={17} color={'#8E8E93'} />
                     </View>
                 </View>
 
@@ -113,8 +98,32 @@ const styles = StyleSheet.create({
         marginRight: 15,
         marginTop: 20
     },
-    name: {
-        fontSize: 16,
+    userName: {
+        fontSize: 20,
         fontWeight: 'bold'
+    },
+    containerFav: {
+        justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        display: 'flex',
+        marginVertical: 25,
+        padding: 10,
+        backgroundColor: 'white',
+        borderRadius: 15,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.13,
+        shadowRadius: 3.84,
+        elevation: 5
+    },
+    testFav: {
+        color: '#8E8E93',
+        fontFamily: 'Ubuntu_500Medium',
+        fontSize: 15,
+        paddingRight: 10
     }
 })
