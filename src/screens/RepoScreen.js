@@ -1,16 +1,17 @@
 //Imports
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, View, ScrollView, FlatList, RefreshControl, Text, Image } from 'react-native';
+import { StyleSheet, View, ScrollView, FlatList, Text, Image, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import moment from "moment";
 import axios from 'axios';
 
+//Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { addFavorite, deleteFavorite } from '../actions/FavoritesActions';
 
 //Components
 import UserCard from '../layouts/UserCard';
-import RepoCard from '../layouts/RepoCard';
 import IssueCard from '../layouts/IssueCard';
-import IconButton from '../layouts/IconButton';
 
 function GetListofIssue(props) {
 	const renderIssueItem = ({item}) => (
@@ -33,17 +34,34 @@ function GetListofIssue(props) {
 	)
 }
 
-function RepoScreen({route, navigation}) {
+function RepoScreen({ route }) {
+
+    //Redux
+	const dispatch = useDispatch();
+	const favorites = useSelector(state => state.favorites.favorites);
+
+	//Values
 	const { repo, collab } = route.params;
 	const apiUrlCollabs = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/issues`;
+
+	//State
 	const [issuesList, setIssuesList] = useState([]);
+
+	const isFavorite = typeof favorites.find(el => el.id === repo.id) === 'object';
+
+    const switchFavorite = () => {
+        if (!isFavorite) {
+			dispatch(addFavorite(repo));
+		} else {
+			dispatch(deleteFavorite(repo.id));
+		}
+    }
 
 	const getAllRepositoryIssues = () => {
 		axios.get(apiUrlCollabs).then(res => {
 			setIssuesList(res.data);
 		}).catch(err => {
-			setErrorMessage("An error occured ! Please try again later.");
-			setIsLoading(false);
+			alert("Error: " + err.message);
 		})
 	}
 
@@ -176,10 +194,12 @@ function RepoScreen({route, navigation}) {
 				</View>
 				<GetListofIssue repoIssues={issuesList}/>
 			</ScrollView>
-			<View style={styles.containerFav}>
-				<Text style={styles.textFav}>Add as favorite</Text>
-				<MaterialCommunityIcons name="heart-outline" size={17} color={"#8E8E93"}/>
-			</View>
+			<TouchableOpacity onPress={switchFavorite}>
+				<View style={styles.containerFav}>
+					<Text style={styles.textFav}>{isFavorite ? "Remove favorite" : "Add as favorite"}</Text>
+					<MaterialCommunityIcons name="star-outline" size={17} color={'#8E8E93'} />
+				</View>
+			</TouchableOpacity>
 		</View>
 	)
 }
@@ -188,7 +208,7 @@ export default RepoScreen;
 
 const styles = StyleSheet.create({
 	containerContributors: {
-		height : 100,
+		height : 300,
 		marginVertical: 10,
 		marginHorizontal: 20,
 		borderRadius: 15,
@@ -202,7 +222,7 @@ const styles = StyleSheet.create({
 		elevation: 5
 	},
 	containerIssues: {
-		height : 200,
+		height : 300,
 		marginVertical: 10,
 		marginHorizontal: 20,
 		borderRadius: 15,
@@ -280,7 +300,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		display :"flex",
-		height : "10%",
+		height : 40,
 		marginVertical: 10,
 		marginHorizontal: 20,
 		padding: 10,

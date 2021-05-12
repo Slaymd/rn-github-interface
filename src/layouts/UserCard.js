@@ -12,22 +12,25 @@ export default function UserCard({user}) {
 	//Redux
 	const dispatch = useDispatch();
 	const favorites = useSelector(state => state.favorites.favorites);
+	const isFavorite = typeof favorites.find(el => el.id === user.id) === 'object';
 
 	//Navigation
 	const navigation = useNavigation();
 
 	const onPress = () => {
-		navigation.push('Users', {userData: user});
+		try {
+			navigation.push('Users', {userData: user});
+		} catch (e) {
+			navigation.navigate('Users', {userData: user});
+		}
 	}
-
-	const isFavorite = typeof favorites.find(el => el.id === user.id) === 'object';
 
 	const onLongPress = () => {
 		if (!isFavorite) {
-			alert("Ajouté aux favoris");
+			alert("Added to favorites");
 			dispatch(addFavorite(user));
 		} else {
-			alert("Retiré des favoris");
+			alert("Removed from favorites");
 			dispatch(deleteFavorite(user.id));
 		}
 	}

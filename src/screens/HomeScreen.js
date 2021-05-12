@@ -36,8 +36,10 @@ function HomeScreen({navigation, ...props}) {
 	*/
 
 	const fetchSearchResults = () => {
-		if (!searchText || searchText.length === 0 || isLoading)
+		if (!searchText || searchText.length === 0 || isLoading) {
+			setIsRefreshing(false);
 			return;
+		}
 		const apiUrl = `https://api.github.com/search/${searchMode}?q=${searchText}&page=${currentPage}&per_page=10`
 		
 		setIsLoading(true);
@@ -149,7 +151,7 @@ function HomeScreen({navigation, ...props}) {
 				refreshControl={
 					<RefreshControl
 					  refreshing={isRefreshing}
-					  onRefresh={onSearchButtonPressed}
+					  onRefresh={onRefresh}
 					/>
 				}
 				onEndReachedThreshold={0.5}

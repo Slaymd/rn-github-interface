@@ -1,16 +1,37 @@
+//Imports
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, FlatList, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+//Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { addFavorite, deleteFavorite } from '../actions/FavoritesActions';
+
+//Components
 import UserCard from '../layouts/UserCard';
 import RepoCard from '../layouts/RepoCard';
 
-function UserScreen({ route, navigation }) {
+function UserScreen({ route }) {
 
+    //Redux
+	const dispatch = useDispatch();
+	const favorites = useSelector(state => state.favorites.favorites);
+
+    //State
     const user = route.params;
     const [repos, setRepos] = useState([]);
     const [followers, setFollowers] = useState([]);
+
+    const isFavorite = typeof favorites.find(el => el.id === user.userData.id) === 'object';
+
+    const switchFavorite = () => {
+        if (!isFavorite) {
+			dispatch(addFavorite(user.userData));
+		} else {
+			dispatch(deleteFavorite(user.userData.id));
+		}
+    }
 
     const fetchResult = () => {
         axios.get(user.userData.followers_url).then(res => {
@@ -46,10 +67,12 @@ function UserScreen({ route, navigation }) {
                             <Text>Type : {user.userData.type}</Text>
                         </View>
                     </View>
-                    <View style={styles.containerFav}>
-                        <Text style={styles.textFav}>Add as favorite</Text>
-                        <MaterialCommunityIcons name="heart-outline" size={17} color={'#8E8E93'} />
-                    </View>
+                    <TouchableOpacity onPress={switchFavorite}>
+                        <View style={styles.containerFav}>
+                            <Text style={styles.textFav}>{isFavorite ? "Remove favorite" : "Add as favorite"}</Text>
+                            <MaterialCommunityIcons name="star-outline" size={17} color={'#8E8E93'} />
+                        </View>
+                    </TouchableOpacity>
                 </View>
 
                 <Text style={styles.text}>Repos : </Text>
@@ -108,6 +131,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         display: 'flex',
         marginVertical: 25,
+        height: 40,
         padding: 10,
         backgroundColor: 'white',
         borderRadius: 15,
@@ -120,9 +144,9 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5
     },
-    testFav: {
+    textFav: {
         color: '#8E8E93',
-        fontFamily: 'Ubuntu_500Medium',
+		fontFamily: 'Ubuntu_500Medium',
         fontSize: 15,
         paddingRight: 10
     }

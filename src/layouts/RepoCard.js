@@ -20,13 +20,17 @@ export default function RepoCard({repo}) {
 	const navigation = useNavigation();
 
 	const onPress = () => {
+		console.log(navigation);
 		const apiUrlCollabs = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/contributors`
 
 		axios.get(apiUrlCollabs).then(res => {
-			navigation.push('Repository', {repo: repo, collab: res});
+			try {
+				navigation.push('Repository', {repo: repo, collab: res});
+			} catch (e) {
+				navigation.navigate('Repository', {repo: repo, collab: res});
+			}
 		}).catch(err => {
-			setErrorMessage("An error occured ! Please try again later.");
-			setIsLoading(false);
+			alert("Error: " + err.message);
 		})
 	}
 
