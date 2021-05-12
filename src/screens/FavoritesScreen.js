@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, FlatList } from 'react-native';
-import { useSelector } from "react-redux";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+//Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { loadFavorites } from '../actions/FavoritesActions';
 
 //Components
 import UserCard from '../layouts/UserCard';
@@ -11,9 +14,20 @@ function FavoritesScreen() {
 
 	const safeAreaInsets = useSafeAreaInsets();
 
+	//Redux
+	const dispatch = useDispatch();
+
 
 	//Redux
 	const favorites = useSelector(state => state.favorites.favorites);
+
+	/*
+	**	EVENTS
+	*/
+
+	useEffect(() => {
+		dispatch(loadFavorites());
+	}, []);
 
 	/*
 	**	RENDER

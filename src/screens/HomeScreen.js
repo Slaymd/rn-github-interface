@@ -1,6 +1,6 @@
 //Imports
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, View, FlatList, RefreshControl, Text } from 'react-native';
+import { StyleSheet, TextInput, View, FlatList, RefreshControl, Text, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import axios from 'axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,6 +27,7 @@ function HomeScreen({navigation, ...props}) {
 	const [userResults, setUsersResults] = useState([]);
 	const [repoResults, setRepoResults] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
 
@@ -46,13 +47,26 @@ function HomeScreen({navigation, ...props}) {
 			else if (searchMode === 'repositories')
 				setRepoResults(currentPage > 1 ? [...repoResults, ...res.data.items] : res.data.items);
 			setIsLoading(false);
+			setIsRefreshing(false);
 			setErrorMessage(null);
 		}).catch(err => {
 			setErrorMessage("An error occured ! Please try again later.");
 			setIsLoading(false);
+			setIsRefreshing(false);
 		})
 	}
 
+	const onRefresh = () => {
+		if (isLoading)
+		return;
+		setUsersResults([]);
+		setRepoResults([]);
+		setCurrentPage(1)
+		setTimeout(() => {
+			setIsRefreshing(true);
+			fetchSearchResults();
+		}, 100)
+	}
 
 	const onSearchButtonPressed = () => {
 		if (isLoading)
@@ -124,13 +138,17 @@ function HomeScreen({navigation, ...props}) {
 				<MaterialCommunityIcons name="alert" size={16} color="white"/>
 				<Text style={styles.alertText}>{errorMessage}</Text>
 			</View>}
+			{isLoading && <View style={styles.loadingContainer} pointerEvents="none">
+				<ActivityIndicator size="large"/>
+				<Text style={styles.loadingText}>{"Loading..."}</Text>
+			</View>}
 			<FlatList
 				data={searchMode === 'users' ? userResults : repoResults}
 				renderItem={renderSearchItem}
 				keyExtractor={(item, index) => item.id + "-" + index}
 				refreshControl={
 					<RefreshControl
-					  refreshing={isLoading}
+					  refreshing={isRefreshing}
 					  onRefresh={onSearchButtonPressed}
 					/>
 				}
@@ -209,7 +227,19 @@ const styles = StyleSheet.create({
 		fontFamily: 'Ubuntu_700Bold',
 		fontSize: 14,
 		paddingLeft: 5
-	}
+	},
+	loadingContainer: {
+		...StyleSheet.absoluteFillObject,
+		zIndex: 99,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	loadingText: {
+		color: 'black',
+		fontFamily: 'Ubuntu_700Bold',
+		fontSize: 18,
+		paddingTop: 10
+	},
 });
 
 export default HomeScreen;

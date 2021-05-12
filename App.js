@@ -32,8 +32,8 @@ const store = createStore(reducers, applyMiddleware(...middlewares));
 
 function SearchStackNavigator() {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Search" component={HomeScreen} />
+    <Stack.Navigator>
+      <Stack.Screen name="Search" component={HomeScreen} options={{headerShown: false}}/>
       <Stack.Screen name="Users" component={UserScreen} />
       <Stack.Screen name="Repository" component={RepoScreen} />
       <Stack.Screen name="Issue" component={IssueScreen} />

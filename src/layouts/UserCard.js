@@ -17,7 +17,7 @@ export default function UserCard({user}) {
 	const navigation = useNavigation();
 
 	const onPress = () => {
-		navigation.navigate('Users', {userData: user});
+		navigation.push('Users', {userData: user});
 	}
 
 	const isFavorite = typeof favorites.find(el => el.id === user.id) === 'object';
