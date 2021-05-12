@@ -38,7 +38,7 @@ function HomeScreen({navigation, ...props}) {
 		if (!searchText || searchText.length === 0 || isLoading)
 			return;
 		const apiUrl = `https://api.github.com/search/${searchMode}?q=${searchText}&page=${currentPage}&per_page=10`
-
+		
 		setIsLoading(true);
 		axios.get(apiUrl).then(res => {
 			if (searchMode === 'users')
@@ -52,6 +52,7 @@ function HomeScreen({navigation, ...props}) {
 			setIsLoading(false);
 		})
 	}
+
 
 	const onSearchButtonPressed = () => {
 		if (isLoading)

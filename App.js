@@ -10,6 +10,8 @@ import HomeScreen from './src/screens/HomeScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import UserScreen from './src/screens/UserScreen';
+import RepoScreen from './src/screens/RepoScreen';
+import IssueScreen from './src/screens/IssueScreen';
 
 //Redux
 import ReduxThunk from 'redux-thunk';
@@ -33,6 +35,8 @@ function SearchStackNavigator() {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Search" component={HomeScreen} />
       <Stack.Screen name="Users" component={UserScreen} />
+      <Stack.Screen name="Repository" component={RepoScreen} />
+      <Stack.Screen name="Issue" component={IssueScreen} />
     </Stack.Navigator>
   )
 }
